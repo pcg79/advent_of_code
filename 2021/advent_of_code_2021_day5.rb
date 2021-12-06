@@ -24,7 +24,7 @@ def find_overlaps(array)
     len = [(y1 - y2).abs, (x1 - x2).abs].max + 1
 
     len.times do |i|
-      floor["#{x1}#{y1}"] += 1
+      floor["#{x1},#{y1}"] += 1
 
       x1 += deltax
       y1 += deltay
