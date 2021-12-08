@@ -9,7 +9,7 @@ def measurement_increases_part1(array)
   count
 end
 
-data = File.open("/Users/patrickgeorge/dev/personal/leetcode/advent_of_code_2021_day1_input.txt").read.split("\n").map(&:to_i)
+data = File.open("/Users/patrickgeorge/dev/personal/advent_of_code/2021/advent_of_code_2021_day1_input.txt").read.split("\n").map(&:to_i)
 
 puts measurement_increases_part1(data)
 
