@@ -8,14 +8,16 @@ def find_all_paths(input)
   paths.sort
 end
 
-def _recurse(node, paths, current_path = [])
+def _recurse(node, paths, current_path = [], small_visited_twice = false)
   current_path << node.name
   node.visit!
-
+  small_visited_twice = true if node.visited == 2
   paths << current_path.dup if node.end?
 
   node.children.each do |child|
-    _recurse(child, paths, current_path) unless child.visited?
+    if child.visited < 1 || !small_visited_twice
+      _recurse(child, paths, current_path, small_visited_twice)
+    end
   end
 
   node.unvisit!
@@ -28,8 +30,8 @@ def create_tree(input)
     start_name, end_name = line.split("-")
     start_node = tree_hash[start_name] ||= Node.new(start_name)
     end_node = tree_hash[end_name] ||= Node.new(end_name)
-    start_node.children << end_node
-    end_node.children << start_node
+    start_node.children << end_node unless end_name == "start" || start_name == "end"
+    end_node.children << start_node unless start_name == "start" || end_name == "end"
   end
 
   tree_hash["start"]
@@ -37,7 +39,7 @@ end
 
 class Node
   attr_accessor :children
-  attr_reader :name, :size
+  attr_reader :name, :size, :visited
 
   def initialize(name)
     @name = name
@@ -47,23 +49,27 @@ class Node
     else
       :small
     end
-    @visited = false
+    @visited = 0
   end
 
   def visit!
-    @visited = true if @size == :small
+    @visited += 1 if @size == :small
   end
 
   def unvisit!
-    @visited = false
+    @visited -= 1 if @size == :small
   end
 
   def visited?
-    @visited
+    @visited == 2
   end
 
   def end?
     name == "end"
+  end
+
+  def to_s
+    "name=#{name}, children=#{children.map(&:name)}"
   end
 end
 
@@ -71,8 +77,11 @@ end
 data = File.open("/Users/patrickgeorge/dev/personal/advent_of_code/2021/advent_of_code_2021_day12_input.txt").read.split("\n")
 
 paths = find_all_paths(data)
-# pp paths
+
+# needs to be lower than 119026
 pp paths.count
+
+
 
 # ------- TESTS --------
 
@@ -82,19 +91,45 @@ def test_find_all_paths
   paths = find_all_paths(data)
 
   output = [
+    ["start", "A", "b", "A", "b", "A", "c", "A", "end"],
+    ["start", "A", "b", "A", "b", "A", "end"],
+    ["start", "A", "b", "A", "b", "end"],
+    ["start", "A", "b", "A", "c", "A", "b", "A", "end"],
+    ["start", "A", "b", "A", "c", "A", "b", "end"],
+    ["start", "A", "b", "A", "c", "A", "c", "A", "end"],
     ["start", "A", "b", "A", "c", "A", "end"],
     ["start", "A", "b", "A", "end"],
+    ["start", "A", "b", "d", "b", "A", "c", "A", "end"],
+    ["start", "A", "b", "d", "b", "A", "end"],
+    ["start", "A", "b", "d", "b", "end"],
     ["start", "A", "b", "end"],
+    ["start", "A", "c", "A", "b", "A", "b", "A", "end"],
+    ["start", "A", "c", "A", "b", "A", "b", "end"],
+    ["start", "A", "c", "A", "b", "A", "c", "A", "end"],
     ["start", "A", "c", "A", "b", "A", "end"],
+    ["start", "A", "c", "A", "b", "d", "b", "A", "end"],
+    ["start", "A", "c", "A", "b", "d", "b", "end"],
     ["start", "A", "c", "A", "b", "end"],
+    ["start", "A", "c", "A", "c", "A", "b", "A", "end"],
+    ["start", "A", "c", "A", "c", "A", "b", "end"],
+    ["start", "A", "c", "A", "c", "A", "end"],
     ["start", "A", "c", "A", "end"],
     ["start", "A", "end"],
+    ["start", "b", "A", "b", "A", "c", "A", "end"],
+    ["start", "b", "A", "b", "A", "end"],
+    ["start", "b", "A", "b", "end"],
+    ["start", "b", "A", "c", "A", "b", "A", "end"],
+    ["start", "b", "A", "c", "A", "b", "end"],
+    ["start", "b", "A", "c", "A", "c", "A", "end"],
     ["start", "b", "A", "c", "A", "end"],
     ["start", "b", "A", "end"],
+    ["start", "b", "d", "b", "A", "c", "A", "end"],
+    ["start", "b", "d", "b", "A", "end"],
+    ["start", "b", "d", "b", "end"],
     ["start", "b", "end"]
-  ]
+]
 
-  pp paths == output.sort
+  pp paths.count == output.count
 end
 
 test_find_all_paths
@@ -104,29 +139,7 @@ def test_find_all_paths2
 
   paths = find_all_paths(data)
 
-  output = [
-    ["start", "HN", "dc", "HN", "end"],
-    ["start", "HN", "dc", "HN", "kj", "HN", "end"],
-    ["start", "HN", "dc", "end"],
-    ["start", "HN", "dc", "kj", "HN", "end"],
-    ["start", "HN", "end"],
-    ["start", "HN", "kj", "HN", "dc", "HN", "end"],
-    ["start", "HN", "kj", "HN", "dc", "end"],
-    ["start", "HN", "kj", "HN", "end"],
-    ["start", "HN", "kj", "dc", "HN", "end"],
-    ["start", "HN", "kj", "dc", "end"],
-    ["start", "dc", "HN", "end"],
-    ["start", "dc", "HN", "kj", "HN", "end"],
-    ["start", "dc", "end"],
-    ["start", "dc", "kj", "HN", "end"],
-    ["start", "kj", "HN", "dc", "HN", "end"],
-    ["start", "kj", "HN", "dc", "end"],
-    ["start", "kj", "HN", "end"],
-    ["start", "kj", "dc", "HN", "end"],
-    ["start", "kj", "dc", "end"]
-  ]
-
-  pp paths == output.sort
+  pp paths.count == 103
 end
 
 test_find_all_paths2
@@ -154,8 +167,7 @@ def test_find_all_paths3
   ]
 
   paths = find_all_paths(data)
-
-  pp paths.count == 226
+  pp paths.count == 3509
 end
 
 test_find_all_paths3
