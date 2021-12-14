@@ -64,7 +64,7 @@ def find_all_flash(octo_grid)
   flashes = 0
   while flashes < 100
     flashes = simulate_step(octo_grid)
-        pp octo_grid
+    pp octo_grid
     step += 1
   end
   step
