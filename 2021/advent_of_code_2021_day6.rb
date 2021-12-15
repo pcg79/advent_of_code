@@ -1,3 +1,4 @@
+# Doing it with a class and modeling each individual fish worked fine until we got to part 2
 # def simulate_fish(ages, days)
 #
 #   school = ages.map do |age|
