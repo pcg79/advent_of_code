@@ -49,18 +49,6 @@ def split_data(data)
   return template, rules
 end
 
-{
-  "NN" => 1,
-  "NC" => 1,
-  "CB" => 1,
-}
-
-{
-  "N" => 2,
-  "C" => 1,
-  "B" => 1,
-}
-
 def process_step(pair_hash, letter_count, rules)
   new_pair_hash = Hash.new(0)
   pair_hash.each_pair do |pair, count|
