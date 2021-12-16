@@ -76,16 +76,14 @@ def sum_version_numbers(hex)
 end
 
 def sum_versions(packet)
-  num = packet[0].to_i(2)
-
   if packet[2].is_a?(Array)
-    sum = num
+    nums = [packet[0].to_i(2)]
     packet[2].each do |packet_item|
-      sum += sum_versions(packet_item)
+      nums << sum_versions(packet_item)
     end
-    sum
+    nums.sum
   else
-    num
+    packet[0].to_i(2)
   end
 end
 
@@ -186,8 +184,8 @@ end
 # test_decode_binary_operator_length_type_zero
 # puts "****** test_decode_binary_operator_length_type_one"
 # test_decode_binary_operator_length_type_one
-# puts "****** test_sum_version_numbers"
-# test_sum_version_numbers
+puts "****** test_sum_version_numbers"
+test_sum_version_numbers
 
 def test_packet_value
   hex = "C200B40A82"
